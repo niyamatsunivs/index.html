@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Nematullah Ansari</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Syne:wght@400;700;800&family=Space+Mono&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #080810;
+      --purple: #7c3aed;
+      --purple-light: #a855f7;
+      --purple-glow: #c084fc;
+      --white: #f0eaff;
+      --gray: #6b7280;
+      --card: #0f0f1a;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--white);
+      font-family: 'Syne', sans-serif;
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* Custom cursor */
+    .cursor {
+      width: 12px; height: 12px;
+      background: var(--purple-glow);
+      border-radius: 50%;
+      position: fixed;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: transform 0.1s, width 0.2s, height 0.2s;
+      mix-blend-mode: difference;
+    }
+    .cursor-ring {
+      width: 36px; height: 36px;
+      border: 1.5px solid var(--purple-light);
+      border-radius: 50%;
+      position: fixed;
+      pointer-events: none;
+      z-index: 9998;
+      transform: translate(-50%, -50%);
+      transition: transform 0.12s ease, width 0.2s, height 0.2s;
+      opacity: 0.6;
+    }
+
+    /* Noise overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0.4;
+    }
+
+    /* Glow blobs */
+    .blob {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(100px);
+      opacity: 0.15;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .blob-1 { width: 500px; height: 500px; background: var(--purple); top: -100px; left: -150px; animation: blobmove 12s ease-in-out infinite alternate; }
+    .blob-2 { width: 400px; height: 400px; background: #1e40af; bottom: -100px; right: -100px; animation: blobmove 15s ease-in-out infinite alternate-reverse; }
+
+    @keyframes blobmove {
+      from { transform: translate(0,0) scale(1); }
+      to { transform: translate(60px, 40px) scale(1.15); }
+    }
+
+    /* Nav */
+    nav {
+      position: fixed; top: 0; width: 100%;
+      padding: 1.2rem 2rem;
+      display: flex; justify-content: space-between; align-items: center;
+      z-index: 100;
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(124,58,237,0.15);
+      background: rgba(8,8,16,0.6);
+    }
+    .nav-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.6rem;
+      letter-spacing: 3px;
+      color: var(--purple-glow);
+    }
+    .nav-links { display: flex; gap: 2rem; }
+    .nav-links a {
+      color: var(--gray);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--purple-glow); }
+
+    /* Hero */
+    .hero {
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      justify-content: center; align-items: flex-start;
+      padding: 0 8vw;
+      position: relative; z-index: 2;
+    }
+
+    .hero-tag {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--purple-light);
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      animation: fadeup 0.8s 0.2s forwards;
+    }
+
+    .hero-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(4rem, 12vw, 11rem);
+      line-height: 0.9;
+      letter-spacing: 2px;
+      opacity: 0;
+      animation: fadeup 0.8s 0.4s forwards;
+    }
+    .hero-name span {
+      display: block;
+      background: linear-gradient(135deg, #fff 0%, var(--purple-glow) 60%, var(--purple) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-sub {
+      margin-top: 1.5rem;
+      font-size: 1.05rem;
+      color: var(--gray);
+      font-weight: 400;
+      letter-spacing: 1px;
+      opacity: 0;
+      animation: fadeup 0.8s 0.6s forwards;
+    }
+    .hero-sub strong { color: var(--purple-light); font-weight: 700; }
+
+    .hero-cta {
+      margin-top: 2.5rem;
+      display: flex; gap: 1rem; flex-wrap: wrap;
+      opacity: 0;
+      animation: fadeup 0.8s 0.8s forwards;
+    }
+    .btn {
+      padding: 0.8rem 2rem;
+      border-radius: 4px;
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 0.85rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      text-decoration: none;
+      cursor: none;
+      transition: all 0.2s;
+    }
+    .btn-primary {
+      background: var(--purple);
+      color: #fff;
+      border: 2px solid var(--purple);
+      box-shadow: 0 0 30px rgba(124,58,237,0.4);
+    }
+    .btn-primary:hover {
+      background: var(--purple-light);
+      box-shadow: 0 0 50px rgba(168,85,247,0.6);
+      transform: translateY(-2px);
+    }
+    .btn-outline {
+      background: transparent;
+      color: var(--white);
+      border: 2px solid rgba(124,58,237,0.5);
+    }
+    .btn-outline:hover {
+      border-color: var(--purple-glow);
+      color: var(--purple-glow);
+      transform: translateY(-2px);
+    }
+
+    /* Scroll indicator */
+    .scroll-indicator {
+      position: absolute;
+      bottom: 2rem; left: 50%;
+      transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center;
+      gap: 0.4rem;
+      opacity: 0;
+      animation: fadeup 1s 1.2s forwards;
+      z-index: 2;
+    }
+    .scroll-indicator span {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 3px;
+      color: var(--gray);
+    }
+    .scroll-line {
+      width: 1px; height: 50px;
+      background: linear-gradient(to bottom, var(--purple-light), transparent);
+      animation: scrollpulse 2s ease-in-out infinite;
+    }
+    @keyframes scrollpulse {
+      0%, 100% { opacity: 0.3; transform: scaleY(1); }
+      50% { opacity: 1; transform: scaleY(1.2); }
+    }
+
+    /* Sections */
+    section {
+      padding: 6rem 8vw;
+      position: relative; z-index: 2;
+    }
+
+    .section-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--purple-light);
+      margin-bottom: 1rem;
+    }
+    .section-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2.5rem, 6vw, 5rem);
+      letter-spacing: 2px;
+      line-height: 1;
+      margin-bottom: 3rem;
+    }
+
+    /* About */
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+    }
+    .about-text p {
+      font-size: 1.05rem;
+      line-height: 1.9;
+      color: #a0a0b8;
+      margin-bottom: 1rem;
+    }
+    .about-text p strong { color: var(--white); }
+    .about-card {
+      background: var(--card);
+      border: 1px solid rgba(124,58,237,0.2);
+      border-radius: 12px;
+      padding: 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .about-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--purple-light), transparent);
+    }
+    .about-card-stat {
+      margin-bottom: 1.5rem;
+    }
+    .about-card-stat:last-child { margin-bottom: 0; }
+    .stat-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 3rem;
+      color: var(--purple-glow);
+      line-height: 1;
+    }
+    .stat-label {
+      font-size: 0.8rem;
+      color: var(--gray);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    /* Football banner */
+    .football-banner {
+      background: linear-gradient(135deg, rgba(124,58,237,0.1), rgba(30,64,175,0.1));
+      border: 1px solid rgba(124,58,237,0.25);
+      border-radius: 12px;
+      padding: 1.5rem 2rem;
+      margin-top: 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .football-emoji { font-size: 2rem; }
+    .football-text { font-size: 0.95rem; color: #a0a0b8; }
+    .football-text strong { color: var(--purple-glow); }
+
+    /* Skills */
+    #skills { background: rgba(15,15,26,0.5); }
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+    }
+    .skill-card {
+      background: var(--card);
+      border: 1px solid rgba(124,58,237,0.15);
+      border-radius: 10px;
+      padding: 1.8rem;
+      text-align: center;
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+    .skill-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(124,58,237,0.05), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .skill-card:hover {
+      border-color: var(--purple-light);
+      transform: translateY(-6px);
+      box-shadow: 0 20px 60px rgba(124,58,237,0.2);
+    }
+    .skill-card:hover::after { opacity: 1; }
+    .skill-icon { font-size: 2.5rem; margin-bottom: 1rem; }
+    .skill-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.4rem;
+      letter-spacing: 2px;
+      color: var(--white);
+      margin-bottom: 0.4rem;
+    }
+    .skill-level {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--purple-light);
+      letter-spacing: 2px;
+    }
+    .skill-bar-bg {
+      margin-top: 1rem;
+      height: 3px;
+      background: rgba(124,58,237,0.2);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .skill-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--purple), var(--purple-glow));
+      border-radius: 2px;
+      animation: barfill 1.5s ease forwards;
+      transform-origin: left;
+    }
+    @keyframes barfill {
+      from { transform: scaleX(0); }
+      to { transform: scaleX(1); }
+    }
+
+    /* Connect / Social */
+    .connect-inner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .connect-inner p {
+      font-size: 1rem;
+      color: var(--gray);
+      margin-bottom: 2.5rem;
+      line-height: 1.8;
+    }
+    .social-links {
+      display: flex; gap: 1.2rem; flex-wrap: wrap; justify-content: center;
+    }
+    .social-link {
+      display: flex; align-items: center; gap: 0.6rem;
+      padding: 0.8rem 1.6rem;
+      border: 1px solid rgba(124,58,237,0.3);
+      border-radius: 6px;
+      color: var(--white);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      transition: all 0.2s;
+      background: var(--card);
+    }
+    .social-link:hover {
+      border-color: var(--purple-glow);
+      color: var(--purple-glow);
+      transform: translateY(-3px);
+      box-shadow: 0 10px 30px rgba(124,58,237,0.25);
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 2rem;
+      border-top: 1px solid rgba(124,58,237,0.1);
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--gray);
+      letter-spacing: 2px;
+      position: relative; z-index: 2;
+    }
+
+    /* Divider */
+    .divider {
+      width: 60px; height: 2px;
+      background: linear-gradient(90deg, var(--purple), transparent);
+      margin-bottom: 2rem;
+    }
+
+    @keyframes fadeup {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .about-grid { grid-template-columns: 1fr; gap: 2rem; }
+      .nav-links { display: none; }
+      .hero { padding: 0 6vw; }
+      section { padding: 4rem 6vw; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+
+  <nav>
+    <div class="nav-logo">NA</div>
+    <div class="nav-links">
+      <a href="#about">About</a>
+      <a href="#skills">Skills</a>
+      <a href="#connect">Connect</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <p class="hero-tag">// Portfolio — 2026</p>
+    <h1 class="hero-name">
+      <span>Nematullah</span>
+      <span>Ansari</span>
+    </h1>
+    <p class="hero-sub">
+      Science Student &nbsp;·&nbsp; <strong>Football Fanatic</strong> &nbsp;·&nbsp; Tech Explorer
+    </p>
+    <div class="hero-cta">
+      <a href="#skills" class="btn btn-primary">View My Skills</a>
+      <a href="#connect" class="btn btn-outline">Get In Touch</a>
+    </div>
+    <div class="scroll-indicator">
+      <span>Scroll</span>
+      <div class="scroll-line"></div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <p class="section-label">// 01 — Who I Am</p>
+    <h2 class="section-title">About Me</h2>
+    <div class="divider"></div>
+    <div class="about-grid">
+      <div class="about-text">
+        <p>
+          Hey! I'm <strong>Nematullah Ansari</strong> — a science student with a deep passion for technology, football, and building things on the web.
+        </p>
+        <p>
+          I love exploring everything from <strong>coding and web development</strong> to video editing. I'm always learning something new and pushing myself to grow every day.
+        </p>
+        <p>
+          Whether it's writing code, editing videos, or watching Messi work his magic — I give everything my 100%.
+        </p>
+        <div class="football-banner">
+          <div class="football-emoji">⚽</div>
+          <div class="football-text">
+            Massive fan of <strong>Lionel Messi</strong> — the greatest of all time. No debate.
+          </div>
+        </div>
+      </div>
+      <div class="about-card">
+        <div class="about-card-stat">
+          <div class="stat-num">5+</div>
+          <div class="stat-label">Skills & Languages</div>
+        </div>
+        <div class="about-card-stat">
+          <div class="stat-num">∞</div>
+          <div class="stat-label">Curiosity Level</div>
+        </div>
+        <div class="about-card-stat">
+          <div class="stat-num">🐐</div>
+          <div class="stat-label">Messi — Always</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SKILLS -->
+  <section id="skills">
+    <p class="section-label">// 02 — What I Know</p>
+    <h2 class="section-title">My Skills</h2>
+    <div class="divider"></div>
+    <div class="skills-grid">
+      <div class="skill-card">
+        <div class="skill-icon">🌐</div>
+        <div class="skill-name">HTML</div>
+        <div class="skill-level">Web Structure</div>
+        <div class="skill-bar-bg"><div class="skill-bar" style="width:85%"></div></div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-icon">⚡</div>
+        <div class="skill-name">JavaScript</div>
+        <div class="skill-level">Web Interactivity</div>
+        <div class="skill-bar-bg"><div class="skill-bar" style="width:65%"></div></div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-icon">🐍</div>
+        <div class="skill-name">Python</div>
+        <div class="skill-level">Programming</div>
+        <div class="skill-bar-bg"><div class="skill-bar" style="width:70%"></div></div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-icon">⚙️</div>
+        <div class="skill-name">C++</div>
+        <div class="skill-level">Systems & Logic</div>
+        <div class="skill-bar-bg"><div class="skill-bar" style="width:60%"></div></div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-icon">🎬</div>
+        <div class="skill-name">Video Editing</div>
+        <div class="skill-level">Content Creation</div>
+        <div class="skill-bar-bg"><div class="skill-bar" style="width:80%"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONNECT -->
+  <section id="connect">
+    <p class="section-label">// 03 — Find Me</p>
+    <h2 class="section-title">Connect</h2>
+    <div class="divider"></div>
+    <div class="connect-inner">
+      <p>I'm always open to connecting with cool people. Whether you want to talk tech, football, or just say hi — hit me up!</p>
+      <div class="social-links">
+        <a href="https://instagram.com/2_255___" target="_blank" class="social-link">
+          📸 Instagram
+        </a>
+        <a href="https://github.com/niyamatsunivs" target="_blank" class="social-link">
+          💻 GitHub
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>Designed & Built by Nematullah Ansari &nbsp;·&nbsp; 2026</p>
+  </footer>
+
+  <script>
+    const cursor = document.getElementById('cursor');
+    const ring = document.getElementById('cursorRing');
+    let mx = 0, my = 0, rx = 0, ry = 0;
+
+    document.addEventListener('mousemove', e => {
+      mx = e.clientX; my = e.clientY;
+      cursor.style.left = mx + 'px';
+      cursor.style.top = my + 'px';
+    });
+
+    function animateRing() {
+      rx += (mx - rx) * 0.12;
+      ry += (my - ry) * 0.12;
+      ring.style.left = rx + 'px';
+      ring.style.top = ry + 'px';
+      requestAnimationFrame(animateRing);
+    }
+    animateRing();
+  </script>
+</body>
+</html>
